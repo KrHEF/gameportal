@@ -1,7 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {TGame, TGameCategory, TGameData, TLanguage, TMerchant, IMerchant} from './types';
+import {Observable, Observer, Subscriber} from 'rxjs';
+import {TGame, TCategory, TGameData, TMerchant, IMerchant} from './types';
+import {Game} from './classes/game';
+import {Category} from './classes/category';
+import {Merchant} from './classes/merchant';
 
 @Injectable({
   providedIn: 'root'
@@ -9,70 +12,45 @@ import {TGame, TGameCategory, TGameData, TLanguage, TMerchant, IMerchant} from '
 export class DataService {
 
   // private url = 'https://www.rost.bet/api/v1/games?lang=ru';
-  private categories: TGameCategory[];
-  private games: TGame[];
-  private merchants: TMerchant[] = [];
+  private url = '/assets/data.json';
+
+  public categories: Category[] = [];
+  public games: Game[] = [];
+  public merchants: Merchant[] = [];
 
   constructor(
     private http: HttpClient
   ) {
-    this.loadData('/assets/data.json');
   }
 
-  private loadData(url: string): void {
-    this.http.get(url).subscribe((data: TGameData) => {
-      if (data.categories) {
-        this.categories = data.categories;
-        // this.loadCategories(data.categories);
-      }
-      if (data.games) {
-        this.games = data.games;
-        // this.loadGames(data.games);
-      }
-      for (const merchId in data.merchants) {
-        if (data.merchants[merchId]) {
-          this.merchants.push(data.merchants[merchId]);
+  // Не знаю как корректно загрузить файлы, итак долго ковырялся. Загрузил вот так.
+  // Возможно надо было загружать по отдельности, возвращать помисы и подключать через Promise.all
+  // Но пока имеем, что есть.
+  public loadData(): Observable<boolean> {
+    return new Observable<boolean>((observer) => {
+      this.http.get(this.url).subscribe((data: TGameData) => {
+
+        if (data.categories) {
+          this.categories = data.categories.map( (cat) => new Category(cat) );
         }
-      }
+
+        for (const merchId in data.merchants) {
+          if ( data.merchants.hasOwnProperty(merchId) ) {
+            this.merchants.push( new Merchant( data.merchants[merchId]) );
+          }
+        }
+
+        if (data.games) {
+          this.games = data.games.map( (game) => new Game(game) );
+        }
+
+        console.log(data.games[0]);
+        console.log(this.games[0]);
+
+        observer.next(true);
+        observer.complete();
+      });
     });
   }
-
-  // private loadCategories(categories: TGameCategory[]): void {
-  //   this.categories = categories.map((cat: TGameCategory) => {
-  //     return {
-  //       ID: cat.ID,
-  //       Name: {
-  //         en: cat.Name.en,
-  //         ru: cat.Name.ru,
-  //       },
-  //       CSort: cat.CSort,
-  //       Slug: cat.Slug,
-  //     };
-  //   });
-  // }
-  //
-  // private loadGames(games: TGame[]): void {
-  //   this.games = games.map((game: TGame) => {
-  //     return {
-  //       ID: game.ID,
-  //       Image: game.Image,
-  //       ImageFullPath: game.ImageFullPath,
-  //       Name: game.Name,
-  //       Description: game.Description,
-  //       CategoryID: game.CategoryID,
-  //       MerchantId: game.MerchantId,
-  //       Sort: game.Sort,
-  //     };
-  //     console.log(this.games);
-  //   });
-  // }
-  //
-  // private loadMerchant(merchants: TMerchant[]): void {
-  //   this.merchants = merchants.map( (merch: TMerchant) => {
-  //     return {
-  //
-  //     }
-  //   });
-  // }
 
 }

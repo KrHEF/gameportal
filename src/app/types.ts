@@ -2,8 +2,13 @@ export type TLanguage = {
   en: string,
   ru: string,
 };
+export type TGameData = {
+  categories: TCategory[],
+  games: TGame[],
+  merchants: IMerchantData,
+};
 
-export type TGameCategory = {
+export type TCategory = {
   ID: string,
   Name: TLanguage,
   CSort: string,
@@ -11,11 +16,13 @@ export type TGameCategory = {
   menuId: string,
 };
 
-export type TGameData = {
-  categories: TGameCategory[],
-  games: TGame[],
-  merchants: IMerchant,
-};
+export interface ICategory {
+  id: number;
+  name: TLanguage;
+  sort: number;
+  slug?: string;
+  menuId?: string;
+}
 
 export type TGame = {
   ID: string,
@@ -24,11 +31,22 @@ export type TGame = {
   Name: TLanguage,
   Description: string[],
   CategoryID: string[],
-  MerchantId: string,
+  MerchantID: string,
   Sort: string,
 };
 
-export interface IMerchant {
+export interface IGame {
+  id: number;
+  image: string;
+  imageFullPath: string;
+  name: TLanguage;
+  description: string[];
+  categoryID: number[];
+  merchantId: number;
+  sort: number;
+}
+
+export interface IMerchantData {
   [index: string]: TMerchant;
 }
 
@@ -40,3 +58,11 @@ export type TMerchant = {
   Image: string,
   menuID: string,
 };
+
+export interface IMerchant {
+  id: number;
+  name: TLanguage;
+  alias?: string;
+  image?: string;
+  menuID?: string;
+}

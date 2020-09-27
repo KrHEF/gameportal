@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {TGameCategory} from './types';
 import {DataService} from './data.service';
+import {Category} from './classes/category';
+import {Game} from './classes/game';
+import {Merchant} from './classes/merchant';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,9 @@ import {DataService} from './data.service';
 })
 export class AppComponent implements OnInit{
   title = 'EF Game Portal';
-  private categories: TGameCategory;
+  public categories: Category[];
+  public merchants: Merchant[];
+  public games: Game[];
 
   constructor(
     private dataService: DataService
@@ -17,7 +21,16 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    // this.dataService.
+    this.dataService.loadData().subscribe((data) => {
+      // this.categories = this.dataService.categories;
+      this.categories = Category.getAll();
+      // this.merchants = this.dataService.merchants;
+      this.merchants = Merchant.getAll();
+      // this.games = this.dataService.games;
+      this.games = this.dataService.games;
+
+      console.log(this.games);
+    });
   }
 
 
