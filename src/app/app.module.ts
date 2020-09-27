@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { GameComponent } from './game/game.component';
 import {HttpClientJsonpModule, HttpClientModule} from '@angular/common/http';
+import { PagerComponent } from './pager/pager.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GameComponent
+    GameComponent,
+    PagerComponent
   ],
   imports: [
     BrowserModule,

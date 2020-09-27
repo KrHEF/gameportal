@@ -11,6 +11,7 @@ import {Merchant} from './classes/merchant';
 })
 export class DataService {
 
+  // Не поучилось подключиться из-за CORS, обойти не смог, пришлось саачать и положить в assets.
   // private url = 'https://www.rost.bet/api/v1/games?lang=ru';
   private url = '/assets/data.json';
 
@@ -43,9 +44,6 @@ export class DataService {
         if (data.games) {
           this.games = data.games.map( (game) => new Game(game) );
         }
-
-        console.log(data.games[0]);
-        console.log(this.games[0]);
 
         observer.next(true);
         observer.complete();
