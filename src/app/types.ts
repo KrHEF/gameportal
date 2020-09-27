@@ -66,3 +66,11 @@ export interface IMerchant {
   image?: string;
   menuID?: string;
 }
+
+// export interface IPager {
+//   PageNumber: number;
+//   readonly StartIndex: number;
+//   readonly EndIndex: number;
+//
+//   change(value: number): void;
+// }

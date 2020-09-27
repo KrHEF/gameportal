@@ -1,9 +1,8 @@
 <app-pager
-  [itemCountOnPage]="pager.countOnPage"
-  [currentPageNumber]="pager.curPageNumber"
-  [itemCount]="GamesCount"
-  (nextPage)="goToPage(pager.curPageNumber + 1)"
-  (prevPage)="goToPage(pager.curPageNumber - 1)"
+  [pager]="pager"
+  [saveInStorage]="true"
+  [keyInStorage]="'GamePageNumber'"
+  (changePageHandler)="changePage()"
 ></app-pager>
 
 <ul *ngFor="let game of Games">

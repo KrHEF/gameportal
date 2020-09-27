@@ -1,31 +1,58 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Pager} from '../classes/pager';
+import {StorageService} from '../storage.service';
 
 @Component({
   selector: 'app-pager',
   templateUrl: './pager.component.html',
   styleUrls: ['./pager.component.css']
 })
-export class PagerComponent implements OnInit {
+export class PagerComponent implements OnInit, OnChanges {
 
-  @Input() itemCountOnPage: number;
-  @Input() currentPageNumber: number;
-  @Input() itemCount: number;
+  private storageService: StorageService;
 
-  @Output() nextPage: EventEmitter<any> = new EventEmitter();
-  @Output() prevPage: EventEmitter<any> = new EventEmitter();
+  @Input() pager: Pager;
+  @Input() saveInStorage = false;
+  @Input() keyInStorage = 'pager';
 
-  constructor() { }
+  @Output() changePageHandler: EventEmitter<any> = new EventEmitter();
+
+  constructor() {}
 
   ngOnInit(): void {
+    if (this.saveInStorage) {
+      this.storageService = new StorageService();
+    }
+  }
+
+  ngOnChanges(): void {
+    // Как-то кривовато, событие вызывается 3 раза, но другое событие,
+    // которое вызывается при позднем связывании данных пока не нашел.
+    if (this.saveInStorage && this.pager && (this.pager.PageCount > 1)) {
+      this.pager.PageNumber = parseInt( this.storageService.getItem(this.keyInStorage), 10 );
+
+      this.changePage();
+    }
+  }
+
+  private changePage(): void {
+    this.changePageHandler.emit();
+
+    if (this.pager.PageNumber === 1) {
+      this.storageService?.removeItem(this.keyInStorage);
+    } else {
+      this.storageService?.setItem(this.keyInStorage, this.pager.PageNumber.toString());
+    }
   }
 
   public goToNextPage(): void {
-    this.nextPage.emit();
+    this.pager.next();
+    this.changePage();
   }
 
   public goToPrevPage(): void {
-    this.prevPage.emit();
-
+    this.pager.prev();
+    this.changePage();
   }
 
 }
