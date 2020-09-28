@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Game} from '../classes/game';
 
 @Component({
@@ -10,10 +10,18 @@ export class GameComponent implements OnInit {
 
   @Input() game: Game;
 
+  @Output() changeFavoritesHandler: EventEmitter<any> = new EventEmitter<any>();
+
   constructor() { }
 
   ngOnInit(): void {
 
   }
+
+  public toggleFavorites(): void {
+    this.game.isFavorites = !this.game.isFavorites;
+    this.changeFavoritesHandler.emit();
+  }
+
 
 }

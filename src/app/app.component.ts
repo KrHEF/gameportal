@@ -5,7 +5,6 @@ import {Category} from './classes/category';
 import {Game} from './classes/game';
 import {Merchant} from './classes/merchant';
 import {Pager} from './classes/pager';
-import set = Reflect.set;
 
 @Component({
   selector: 'app-root',
@@ -13,29 +12,33 @@ import set = Reflect.set;
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  readonly title = 'EF Game Portal';
+  readonly title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 5];
+  readonly version: number[] = [1, 0, 0, 6];
 
   public pager: Pager;
   public settings = {
     storageService: StorageService.get(),
     gamesOnPage: {
-      keyStorage: 'GamesOnPage',
+      storable: 1,
       values: [10, 20, 30, 40, 50],
       value: 10,
     },
     gamePageNumber: {
-      keyStorage: 'GamePageNumber',
+      storable: 1,
       value: 1,
-    }
+    },
+    gameInFavorites: {
+      storable: 1,
+      value: '',
+    },
   };
 
   public categories: Category[] = [];
   public merchants: Merchant[] = [];
   private games: Game[] = [];
   private gamesOnPage: Game[] = [];
-  private gamesInFavorite: Game[] = [];
+  private gamesInFavorites: Game[] = [];
 
   public get GamesCount(): number {
     return this.games.length;
@@ -60,6 +63,7 @@ export class AppComponent implements OnInit {
         this.categories = this.dataService.categories;
         this.merchants = this.dataService.merchants;
         this.games = this.dataService.games;
+        this.initFavorites();
 
         this.pager = new Pager(this.GamesCount,
           this.settings.gamesOnPage.value,
@@ -73,6 +77,8 @@ export class AppComponent implements OnInit {
       this.gamesOnPage = this.games.slice(this.pager.StartIndex, this.pager.EndIndex);
     }
   }
+
+  // События
 
   public changePageNumber(): void {
     this.settings.gamePageNumber.value = this.pager.PageNumber;
@@ -89,30 +95,62 @@ export class AppComponent implements OnInit {
     this.saveInStorage();
   }
 
+  private initFavorites(): void {
+    const gameIds: number[] = this.settings.gameInFavorites.value
+      .split(',')
+      .map((id: string) => parseInt(id, 10))
+      .filter((id: number) => !isNaN(id));
+
+    this.games.forEach((game) => game.isFavorites = (gameIds.indexOf(game.id) >= 0));
+    this.changeFavorites();
+  }
+
+  public changeFavorites(): void {
+    this.gamesInFavorites = this.games.filter((game) => game.isFavorites);
+    this.settings.gameInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
+    this.saveInStorage();
+  }
+
+  public toggleFavorites(): void {
+    console.warn('Не забыть прицепить к фильтрации');
+  }
+
+  // LocalStorage
+
+  /**
+   * Сохранение всех сохраняемых настроек в localStorage
+   * @private
+   */
   private saveInStorage(): void {
     for (const key in this.settings) {
       if (this.settings.hasOwnProperty(key)) {
 
         const setting = this.settings[key];
-        if (!setting.hasOwnProperty('keyStorage') || !setting.hasOwnProperty('value')) {
-          continue;
+        if (setting.hasOwnProperty('storable')
+          && setting.hasOwnProperty('value')
+          && setting.storable) {
+          this.settings.storageService.setItem(key, setting.value.toString());
         }
-
-        this.settings.storageService.setItem(setting.keyStorage, setting.value.toString());
       }
     }
   }
 
+  /**
+   * Получение настроек сохраняемых настроек из localStorage
+   * @private
+   */
   private loadFromStorage(): void {
     for (const key in this.settings) {
       if (this.settings.hasOwnProperty(key)) {
 
         const setting = this.settings[key];
-        if (!setting.hasOwnProperty('keyStorage') || !setting.hasOwnProperty('value')) {
+        if (!setting.hasOwnProperty('storable')
+          || !setting.hasOwnProperty('value')
+          || !setting.storable) {
           continue;
         }
 
-        const value: string = this.settings.storageService.getItem(setting.keyStorage);
+        const value: string = this.settings.storageService.getItem(key);
         if (!value) {
           continue;
         } else if ((typeof setting.value === 'string')) {

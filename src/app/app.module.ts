@@ -6,13 +6,15 @@ import { GameComponent } from './game/game.component';
 import {HttpClientJsonpModule, HttpClientModule} from '@angular/common/http';
 import { PagerComponent } from './pager/pager.component';
 import { SettingComponent } from './setting/setting.component';
+import { FavoriteComponent } from './favorite/favorite.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GameComponent,
     PagerComponent,
-    SettingComponent
+    SettingComponent,
+    FavoriteComponent
   ],
   imports: [
     BrowserModule,

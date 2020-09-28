@@ -9,12 +9,28 @@
       >
       </app-pager>
     </nav>
+
+    <app-favorite
+      [length]="gamesInFavorites.length"
+      (toggleFavoriteHandler)="toggleFavorites()"
+    >
+    </app-favorite>
+
+    <div class="panel">
+      <span class="total" *ngIf="games.length" >Всего: <b>{{games.length}}</b></span>
+      <a href="#" class="search">search</a>
+      <a href="#" class="filter">filter</a>
+      <a href="#" class="setting">setting</a>
+    </div>
   </div>
 </header>
 <div class="container">
   <main>
     <article *ngFor="let game of Games">
-        <app-game [game]="game"></app-game>
+        <app-game
+          [game]="game"
+          (changeFavoritesHandler)="changeFavorites()"
+        ></app-game>
     </article>
   </main>
 
@@ -23,6 +39,7 @@
       <h3>Фильтр:</h3>
       <app-setting
         type="select"
+        [values]=""
       >
         <h4 class="head">Категория:</h4>
       </app-setting>
@@ -48,6 +65,10 @@
       >
         <h4 class="head">Просто настройка:</h4>
       </app-setting>
+    </section>
+    <section class="footer">
+      <div class="copyright">Developed by {{author}}</div>
+      <div class="version">v. {{version.join('.')}}</div>
     </section>
   </aside>
 </div>

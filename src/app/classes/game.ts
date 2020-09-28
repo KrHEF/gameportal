@@ -12,9 +12,16 @@ export class Game implements IGame {
   imageFullPath = '';
   merchantId = -1;
   sort = 0;
+  isFavorites = false;
 
   private category: Category[] = [];
   private merchant: Merchant;
+
+  public get Name(): string {
+    // Пока так сделаем, по идее надо куда-то передавать глобальный идентификатор языка
+    // и выводить название в зависимости от него.
+    return (this.name.ru !== '') ? this.name.ru : this.name.en;
+  }
 
   constructor(game: TGame) {
     this.id = parseInt(game.ID, 10);

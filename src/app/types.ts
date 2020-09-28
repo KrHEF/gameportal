@@ -74,3 +74,7 @@ export interface IMerchant {
 //
 //   change(value: number): void;
 // }
+
+// export interface IFiltered {
+//
+// }

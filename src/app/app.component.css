@@ -1,17 +1,27 @@
 .container {
   display: flex;
   justify-content: space-between;
+  padding: 0 15px;
 }
 
 header nav {
   align-self: center;
 }
-header h1 {
+header h1,
+header .panel {
   flex: 0 1 25%;
 }
 
-header > .container {
-  justify-content: flex-start;
+header .panel {
+  display: flex;
+  justify-content: flex-end;
+}
+header .panel > * {
+  margin: 0 10px;
+}
+
+header .container {
+  align-items: center;
 }
 
 .container > main {
@@ -19,4 +29,10 @@ header > .container {
 }
 .container > aside {
   flex: 0 1 25%;
+}
+
+aside {
+}
+aside > section:nth-child(n+2) {
+  margin-top: 50px;
 }
