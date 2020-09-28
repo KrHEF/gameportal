@@ -1,27 +1,32 @@
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
 export class StorageService implements Storage {
 
-  private storage: Storage;
+  get length(): number {
+    return this.storage.length;
+  }
 
-  // [name: string]: any;
-
-  get length(): number { return this.storage.length; }
-
-  constructor() {
+  private constructor() {
     this.storage = window.localStorage;
   }
 
+  private static storageService: StorageService;
+
+  private storage: Storage;
+
+  public static get(): StorageService {
+    if (!this.storageService) {
+      this.storageService = new StorageService();
+    }
+    return this.storageService;
+  }
 
   clear(): void {
     this.storage.clear();
   }
 
   getItem(key: string): string | null {
-    return this.storage[key];
+    if (key) {
+      return this.storage[key];
+    }
   }
 
   key(index: number): string | null {
@@ -33,7 +38,8 @@ export class StorageService implements Storage {
   }
 
   setItem(key: string, value: string): void {
-    this.storage.setItem(key, value);
+    if (key) {
+      this.storage.setItem(key, value);
+    }
   }
-
 }

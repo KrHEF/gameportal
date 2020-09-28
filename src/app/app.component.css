@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+header nav {
+  align-self: center;
+}
+header h1 {
+  flex: 0 1 25%;
+}
+
+header > .container {
+  justify-content: flex-start;
+}
+
+.container > main {
+  flex: auto;
+}
+.container > aside {
+  flex: 0 1 25%;
+}

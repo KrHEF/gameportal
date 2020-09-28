@@ -21,7 +21,7 @@ export class PagerComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (this.saveInStorage) {
-      this.storageService = new StorageService();
+      this.storageService = StorageService.get();
     }
   }
 

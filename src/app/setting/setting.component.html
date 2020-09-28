@@ -1,0 +1,15 @@
+<ng-content select=".head"></ng-content>
+<div *ngIf="type === 'select'">
+  <select #selectedElement (change)="changeValue(selectedElement)">
+    <option
+      *ngFor="let val of stringValues; let i = index"
+      [attr.value]="i"
+      [attr.selected]="selectedIndex === i ? true : null"
+    >
+      {{val}}
+    </option>
+  </select>
+</div>
+<div *ngIf="type === 'input'">
+  <input #inputElement type="text" [attr.value]="value" (change)="changeValue(inputElement)" />
+</div>

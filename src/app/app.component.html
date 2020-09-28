@@ -1,12 +1,58 @@
-<app-pager
-  [pager]="pager"
-  [saveInStorage]="true"
-  [keyInStorage]="'GamePageNumber'"
-  (changePageHandler)="changePage()"
-></app-pager>
+<header>
+  <div class="container">
+    <h1>{{title}}</h1>
 
-<ul *ngFor="let game of Games">
-  <li>
-    <app-game [game]="game"></app-game>
-  </li>
-</ul>
+    <nav>
+      <app-pager
+        [pager]="pager"
+        [saveInStorage]="true"
+        [keyInStorage]="'GamePageNumber'"
+        (changePageHandler)="changePageNumber()"
+      >
+      </app-pager>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <main>
+    <article *ngFor="let game of Games">
+        <app-game [game]="game"></app-game>
+    </article>
+  </main>
+
+  <aside>
+    <section class="filter-wrapper">
+      <h3>Фильтр:</h3>
+      <app-setting
+        type="select"
+      >
+        <h4 class="head">Категория:</h4>
+      </app-setting>
+      <app-setting
+        type="select"
+      >
+        <h4 class="head">Провайдер:</h4>
+      </app-setting>
+    </section>
+    <section class="setting-wrapper">
+      <h3>Настройки: </h3>
+      <app-setting
+        type="select"
+        [values]="settings.gamesOnPage.values"
+        [value]="settings.gamesOnPage.value"
+        (changeValueHandler)="changeGamesOnPageCount($event)"
+      >
+        <h4 class="head">На странице:</h4>
+      </app-setting>
+      <app-setting
+        type="input"
+        [value]="123"
+      >
+        <h4 class="head">Просто настройка:</h4>
+      </app-setting>
+    </section>
+  </aside>
+</div>
+<footer>
+
+</footer>

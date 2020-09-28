@@ -23,6 +23,16 @@ export class Pager {
     return this.pageNumber * this.itemOnPage - 1;
   }
 
+  public get ItemOnPage(): number { return this.itemOnPage; }
+  public set ItemOnPage(value: number) {
+    if (value >= 0) {
+      this.itemOnPage = value;
+      // Может оказаться, что текущая страница больше кол-ва страниц,
+      // а в сеттере PageNumber есть проверка.
+      this.PageNumber = this.PageNumber;
+    }
+  }
+
   public constructor(itemCount, itemOnPage, pageNumber = 1) {
     this.itemCount = itemCount;
     this.itemOnPage = (itemOnPage > 0) ? itemOnPage : 1;

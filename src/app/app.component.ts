@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {DataService} from './data.service';
+import {StorageService} from './storage.service';
 import {Category} from './classes/category';
 import {Game} from './classes/game';
 import {Merchant} from './classes/merchant';
@@ -10,11 +11,20 @@ import {Pager} from './classes/pager';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   readonly title = 'EF Game Portal';
-  readonly version: number[] = [1, 0, 0, 3];
+  readonly author = 'EF';
+  readonly version: number[] = [1, 0, 0, 4];
 
   public pager: Pager;
+  public settings = {
+    storageService: StorageService.get(),
+    gamesOnPage: {
+      keyStorage: 'GamesOnPageCount',
+      values: [10, 20, 30, 40, 50],
+      value: 10,
+    },
+  };
 
   public categories: Category[] = [];
   public merchants: Merchant[] = [];
@@ -27,21 +37,31 @@ export class AppComponent implements OnInit{
   }
 
   public get Games(): Game[] {
-    if (!this.gamesOnPage.length) { this.setCurrentGames(); }
+    if (!this.gamesOnPage.length) {
+      this.setCurrentGames();
+    }
     return this.gamesOnPage;
   }
 
   constructor(
     private dataService: DataService,
   ) {
+    const gamesOnPageValue: number = parseInt(this.loadFromStorage(this.settings.gamesOnPage.keyStorage), 10);
+    if (gamesOnPageValue) {
+      this.settings.gamesOnPage.value = gamesOnPageValue;
+    }
+
   }
 
   ngOnInit(): void {
-    this.dataService.loadData().subscribe((data) => {
-      this.categories = this.dataService.categories;
-      this.merchants = this.dataService.merchants;
-      this.games = this.dataService.games;
-      this.pager = new Pager(this.GamesCount, 10);
+    this.dataService.loadData().subscribe((isLoad) => {
+      if (isLoad) {
+        this.categories = this.dataService.categories;
+        this.merchants = this.dataService.merchants;
+        this.games = this.dataService.games;
+
+        this.pager = new Pager(this.GamesCount, this.settings.gamesOnPage.value);
+      }
     });
   }
 
@@ -51,7 +71,24 @@ export class AppComponent implements OnInit{
     }
   }
 
-  public changePage(): void {
+  public changePageNumber(): void {
     this.setCurrentGames();
   }
+
+  public changeGamesOnPageCount(value: number): void {
+    this.pager.ItemOnPage = value;
+    this.settings.gamesOnPage.value = this.pager.ItemOnPage;
+    this.setCurrentGames();
+
+    this.saveInStorage(this.settings.gamesOnPage.keyStorage, this.pager.ItemOnPage);
+  }
+
+  private saveInStorage(key: string, value: any): void {
+    this.settings.storageService.setItem(key, value.toString());
+  }
+
+  private loadFromStorage(key: string): string {
+    return this.settings.storageService.getItem(key);
+  }
+
 }
