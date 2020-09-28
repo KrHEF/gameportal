@@ -15,7 +15,6 @@ export class GameComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
   }
 
   public toggleFavorites(): void {

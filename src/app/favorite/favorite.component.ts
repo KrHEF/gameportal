@@ -9,15 +9,28 @@ export class FavoriteComponent implements OnInit {
 
   @Input() length = 0;
 
-  @Output() toggleFavoriteHandler: EventEmitter<any> = new EventEmitter<any>();
+  @Output() toggleFavoriteHandler: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  private show = false;
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  public toggleFavorite(): void {
-    this.toggleFavoriteHandler.emit();
+  public toggleFavorite(target: EventTarget): void {
+    if (!this.length) { return; }
+
+    this.show = !this.show;
+    if (target instanceof HTMLAnchorElement) {
+      if (this.show) {
+        target.className += ' on';
+      } else {
+        target.className = target.className.replace('on', '').trim();
+      }
+    }
+
+    this.toggleFavoriteHandler.emit(this.show);
   }
 
 }

@@ -1,5 +1,5 @@
 <div *ngIf="pager && pager.PageCount > 1">
-  <a href="#" (click)="goToPrevPage()">&lt;</a>
+  <a href="#" (click)="goToPrevPage()" title="Предыдущая страница">&lt;</a>
   {{pager?.PageNumber}}
-  <a href="#" (click)="goToNextPage()">&gt;</a>
+  <a href="#" (click)="goToNextPage()" title="Следующая страница">&gt;</a>
 </div>

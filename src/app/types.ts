@@ -41,7 +41,7 @@ export interface IGame {
   imageFullPath: string;
   name: TLanguage;
   description: string[];
-  categoryID: number[];
+  categoryIds: number[];
   merchantId: number;
   sort: number;
 }
@@ -75,6 +75,7 @@ export interface IMerchant {
 //   change(value: number): void;
 // }
 
-// export interface IFiltered {
-//
-// }
+export interface IFiltered {
+  id: number;
+  Name: string;
+}

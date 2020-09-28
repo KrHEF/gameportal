@@ -1,11 +1,15 @@
-import {IMerchant, TLanguage, TMerchant} from '../types';
+import {IFiltered, IMerchant, TLanguage, TMerchant} from '../types';
 
-export class Merchant implements IMerchant {
+export class Merchant implements IMerchant, IFiltered {
 
   private static collection: Merchant[] = [];
 
   id = -1;
   name: TLanguage = {en: '', ru: ''};
+
+  public get Name(): string {
+    return (this.name.ru !== '') ? this.name.ru : this.name.en;
+  }
 
   public constructor({ID: id, Name: name}: TMerchant) {
     this.id = parseInt(id, 10);

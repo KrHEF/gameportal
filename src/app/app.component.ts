@@ -12,12 +12,13 @@ import {Pager} from './classes/pager';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
   readonly title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 6];
+  readonly version: number[] = [1, 0, 0, 7];
 
   public pager: Pager;
-  public settings = {
+  public storageSettings = {
     storageService: StorageService.get(),
     gamesOnPage: {
       storable: 1,
@@ -25,10 +26,22 @@ export class AppComponent implements OnInit {
       value: 10,
     },
     gamePageNumber: {
-      storable: 1,
+      // storable: 1,
       value: 1,
     },
     gameInFavorites: {
+      storable: 1,
+      value: '',
+    },
+    filterCategories: {
+      storable: 1,
+      value: '',
+    },
+    filterMerchant: {
+      storable: 1,
+      value: '',
+    },
+    filterName: {
       storable: 1,
       value: '',
     },
@@ -39,9 +52,51 @@ export class AppComponent implements OnInit {
   private games: Game[] = [];
   private gamesOnPage: Game[] = [];
   private gamesInFavorites: Game[] = [];
+  private gamesFiltered: Game[];
 
+  public filters = {
+    categories: [],
+    merchants: [],
+    name: '',
+  };
+
+
+  /**
+   * Количество загруженных игр
+   * @constructor
+   */
   public get GamesCount(): number {
     return this.games.length;
+  }
+
+  /**
+   * Количество игр в избранном
+   * @constructor
+   */
+  public get FavoriteGamesCount(): number {
+    return this.gamesInFavorites.length;
+  }
+
+  /**
+   * Количество отфильтрованных игр
+   * @constructor
+   */
+  public get FilteredGamesCount(): number {
+    return this.gamesFiltered.length;
+  }
+
+  /**
+   * Возвращает true, если хотя бы один из фильтров установлен
+   */
+  public get isFiltered(): boolean {
+    for (const key in this.filters) {
+      if (this.filters.hasOwnProperty(key)) {
+        if (this.filters[key].length > 0) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public get Games(): Game[] {
@@ -58,30 +113,81 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const sortByName = (a: { Name: string }, b: { Name: string }) => a.Name.toLowerCase() > b.Name.toLowerCase() ? 1 : -1;
+
     this.dataService.loadData().subscribe((isLoad) => {
       if (isLoad) {
-        this.categories = this.dataService.categories;
-        this.merchants = this.dataService.merchants;
+        const favoritesCategory: Category = new Category({
+          ID: '0',
+          Name: {en: 'Favorites', ru: 'Избранное'},
+          CSort: '1000',
+          Slug: 'favorites',
+          menuId: 'favorites'
+        });
+
+        this.categories = this.dataService.categories.sort(sortByName);
+        this.categories.unshift(favoritesCategory);
+        this.merchants = this.dataService.merchants.sort(sortByName);
         this.games = this.dataService.games;
-        this.initFavorites();
+        this.gamesFiltered = this.games;
 
         this.pager = new Pager(this.GamesCount,
-          this.settings.gamesOnPage.value,
-          this.settings.gamePageNumber.value);
+          this.storageSettings.gamesOnPage.value,
+          this.storageSettings.gamePageNumber.value);
+
+        this.initFavorites();
+        // this.initFilters();
       }
     });
   }
 
+  // Игры, отображающиеся на странице с учетом текущей страницы
   private setCurrentGames(): void {
     if (this.pager) {
-      this.gamesOnPage = this.games.slice(this.pager.StartIndex, this.pager.EndIndex);
+      this.gamesOnPage = this.gamesFiltered.slice(this.pager.StartIndex, this.pager.EndIndex);
     }
   }
 
-  // События
+  // Отфильтрованные игры
+  private setFilteredGames(): void {
+    const f = this.filters;
+    let result: Game[] = this.games;
+
+    if (this.isFiltered) {
+      // Фильтр по категориям
+      if (f.categories.length > 0) {
+        result = result.filter((game) => {
+          return f.categories.some((cat) => {
+            return game.categoryIds.includes(cat.id)
+              || (cat.id === 0 && game.isFavorites);
+          });
+        });
+      }
+      // Фильтр по производителям
+      if (f.merchants.length > 0) {
+        result = result.filter((game) => {
+          return f.merchants.some((merch) => merch.id === game.merchantId);
+        });
+      }
+      // Фильтр по названию
+      if (f.name.length > 0) {
+        result = result.filter((game) => {
+          return game.name.ru.toLowerCase().includes(f.name.toLowerCase())
+            || game.name.en.toLowerCase().includes(f.name.toLowerCase());
+        });
+      }
+
+    }
+    this.gamesFiltered = result;
+
+    this.pager.update(this.gamesFiltered.length);
+    this.setCurrentGames();
+  }
+
+  // События пейджера
 
   public changePageNumber(): void {
-    this.settings.gamePageNumber.value = this.pager.PageNumber;
+    this.storageSettings.gamePageNumber.value = this.pager.PageNumber;
     this.setCurrentGames();
 
     this.saveInStorage();
@@ -89,14 +195,16 @@ export class AppComponent implements OnInit {
 
   public changeGamesOnPageCount(value: number): void {
     this.pager.ItemOnPage = value;
-    this.settings.gamesOnPage.value = this.pager.ItemOnPage;
+    this.storageSettings.gamesOnPage.value = this.pager.ItemOnPage;
     this.setCurrentGames();
 
     this.saveInStorage();
   }
 
+  // События избранных
+
   private initFavorites(): void {
-    const gameIds: number[] = this.settings.gameInFavorites.value
+    const gameIds: number[] = this.storageSettings.gameInFavorites.value
       .split(',')
       .map((id: string) => parseInt(id, 10))
       .filter((id: number) => !isNaN(id));
@@ -107,12 +215,56 @@ export class AppComponent implements OnInit {
 
   public changeFavorites(): void {
     this.gamesInFavorites = this.games.filter((game) => game.isFavorites);
-    this.settings.gameInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
+    this.storageSettings.gameInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
     this.saveInStorage();
   }
 
-  public toggleFavorites(): void {
-    console.warn('Не забыть прицепить к фильтрации');
+  public toggleFavorites(show: boolean): void {
+    // this.filters.favorites = show ? this.gamesInFavorites : [];
+    // this.setFilteredGames();
+  }
+
+  // События фильтров
+
+  public initFilters(): void {
+    const setting = this.storageSettings;
+
+    // Категории
+    const catIds: number[] = this.getNumbersFromString(setting.filterCategories.value);
+    this.filters.categories = this.categories.filter((cat) => catIds.includes(cat.id));
+
+    // Мерчанты
+    const merchIds: number[] = this.getNumbersFromString(setting.filterMerchant.value);
+    this.filters.merchants = this.merchants.filter((merch) => merchIds.includes(merch.id));
+
+    // Названия
+    this.filters.name = setting.filterName.value;
+
+    this.setFilteredGames();
+  }
+
+  public changeFilterCategories(selectedItems: Category[]): void {
+    this.filters.categories = selectedItems;
+    this.setFilteredGames();
+
+    this.storageSettings.filterCategories.value = selectedItems.map((item) => item.id).join();
+    this.saveInStorage();
+  }
+
+  public changeFilterMerchant(selectedItems: Merchant[]): void {
+    this.filters.merchants = selectedItems;
+    this.setFilteredGames();
+
+    this.storageSettings.filterMerchant.value = selectedItems.map((item) => item.id).join();
+    this.saveInStorage();
+  }
+
+  public changeFilterName(text: string): void {
+    this.filters.name = text.trim();
+    this.setFilteredGames();
+
+    this.storageSettings.filterName.value = text;
+    this.saveInStorage();
   }
 
   // LocalStorage
@@ -122,14 +274,14 @@ export class AppComponent implements OnInit {
    * @private
    */
   private saveInStorage(): void {
-    for (const key in this.settings) {
-      if (this.settings.hasOwnProperty(key)) {
+    for (const key in this.storageSettings) {
+      if (this.storageSettings.hasOwnProperty(key)) {
 
-        const setting = this.settings[key];
+        const setting = this.storageSettings[key];
         if (setting.hasOwnProperty('storable')
           && setting.hasOwnProperty('value')
           && setting.storable) {
-          this.settings.storageService.setItem(key, setting.value.toString());
+          this.storageSettings.storageService.setItem(key, setting.value.toString());
         }
       }
     }
@@ -140,17 +292,17 @@ export class AppComponent implements OnInit {
    * @private
    */
   private loadFromStorage(): void {
-    for (const key in this.settings) {
-      if (this.settings.hasOwnProperty(key)) {
+    for (const key in this.storageSettings) {
+      if (this.storageSettings.hasOwnProperty(key)) {
 
-        const setting = this.settings[key];
+        const setting = this.storageSettings[key];
         if (!setting.hasOwnProperty('storable')
           || !setting.hasOwnProperty('value')
           || !setting.storable) {
           continue;
         }
 
-        const value: string = this.settings.storageService.getItem(key);
+        const value: string = this.storageSettings.storageService.getItem(key);
         if (!value) {
           continue;
         } else if ((typeof setting.value === 'string')) {
@@ -162,5 +314,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private getNumbersFromString(str: string): number[] {
+    return str.split(',')
+      .map((id: string) => parseInt(id, 10))
+      .filter((id: number) => !isNaN(id));
+  }
 
 }

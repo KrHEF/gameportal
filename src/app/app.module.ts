@@ -7,6 +7,8 @@ import {HttpClientJsonpModule, HttpClientModule} from '@angular/common/http';
 import { PagerComponent } from './pager/pager.component';
 import { SettingComponent } from './setting/setting.component';
 import { FavoriteComponent } from './favorite/favorite.component';
+import { FilterComponent } from './filter/filter.component';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -14,12 +16,14 @@ import { FavoriteComponent } from './favorite/favorite.component';
     GameComponent,
     PagerComponent,
     SettingComponent,
-    FavoriteComponent
+    FavoriteComponent,
+    FilterComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    HttpClientJsonpModule
+    HttpClientJsonpModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

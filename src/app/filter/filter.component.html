@@ -1,0 +1,40 @@
+<ng-content select=".head"></ng-content>
+
+<div *ngIf="type === 'multiselect'">
+  <select multiple
+          *ngIf="values.length"
+          (change)="changeValue($event.target)"
+  >
+    <option
+      *ngFor="let val of stringValues; let i = index"
+      [attr.value]="i"
+    >
+      {{val}}
+    </option>
+  </select>
+</div>
+
+<div *ngIf="type === 'select'">
+  <select
+    *ngIf="values.length"
+    (change)="changeValue($event.target)"
+  >
+    <option
+      value="-1"
+    > - Не выбрано -
+    </option>
+    <option
+      *ngFor="let val of stringValues; let i = index"
+      [attr.value]="i"
+    >
+      {{val}}
+    </option>
+  </select>
+</div>
+
+<div *ngIf="type === 'input'">
+  <input type="text"
+         (change)="changeValue($event.target)"
+         (keyup)="prechangeValue($event.target)"
+  />
+</div>

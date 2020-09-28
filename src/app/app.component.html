@@ -11,61 +11,73 @@
     </nav>
 
     <app-favorite
-      [length]="gamesInFavorites.length"
-      (toggleFavoriteHandler)="toggleFavorites()"
+      [length]="FavoriteGamesCount"
+      (toggleFavoriteHandler)="toggleFavorites($event)"
     >
     </app-favorite>
 
     <div class="panel">
-      <span class="total" *ngIf="games.length" >Всего: <b>{{games.length}}</b></span>
-      <a href="#" class="search">search</a>
-      <a href="#" class="filter">filter</a>
-      <a href="#" class="setting">setting</a>
+      <span class="total" *ngIf="GamesCount">Игр: <b *ngIf="isFiltered">{{FilteredGamesCount}}
+        /</b><b>{{GamesCount}}</b></span>
+      <!--      <a href="#" class="search" title="Показать панель поиска">Поиск</a>-->
+      <a href="#" class="filter" title="Открыть окно с фильтрами">Фильтры <span *ngIf="isFiltered">!</span></a>
+      <a href="#" class="setting" title="Открыть окно с настройками ">Настройки</a>
     </div>
   </div>
 </header>
+
 <div class="container">
   <main>
     <article *ngFor="let game of Games">
-        <app-game
-          [game]="game"
-          (changeFavoritesHandler)="changeFavorites()"
-        ></app-game>
+      <app-game
+        [game]="game"
+        (changeFavoritesHandler)="changeFavorites()"
+      ></app-game>
+    </article>
+    <article class="sorry" *ngIf="isFiltered && !FilteredGamesCount">
+      Игры не найдены.
     </article>
   </main>
 
   <aside>
+    <!--    Фильтры -->
     <section class="filter-wrapper">
       <h3>Фильтр:</h3>
-      <app-setting
-        type="select"
-        [values]=""
+      <app-filter
+        type="multiselect"
+        [values]="categories"
+        (changeValueHandler)="changeFilterCategories($event)"
       >
         <h4 class="head">Категория:</h4>
-      </app-setting>
-      <app-setting
+      </app-filter>
+      <app-filter
         type="select"
+        [values]="merchants"
+        (changeValueHandler)="changeFilterMerchant($event)"
       >
         <h4 class="head">Провайдер:</h4>
-      </app-setting>
+      </app-filter>
+      <app-filter
+        type="input"
+        (changeValueHandler)="changeFilterName($event)"
+      >
+        <h4 class="head">Фильтр по названию:</h4>
+      </app-filter>
     </section>
+
+    <!-- Настройки-->
     <section class="setting-wrapper">
       <h3>Настройки: </h3>
       <app-setting
         type="select"
-        [values]="settings.gamesOnPage.values"
-        [value]="settings.gamesOnPage.value"
+        [values]="storageSettings.gamesOnPage.values"
+        [value]="storageSettings.gamesOnPage.value"
         (changeValueHandler)="changeGamesOnPageCount($event)"
       >
         <h4 class="head">На странице:</h4>
       </app-setting>
-      <app-setting
-        type="input"
-        [value]="123"
-      >
-        <h4 class="head">Просто настройка:</h4>
-      </app-setting>
     </section>
+
     <section class="footer">
       <div class="copyright">Developed by {{author}}</div>
       <div class="version">v. {{version.join('.')}}</div>

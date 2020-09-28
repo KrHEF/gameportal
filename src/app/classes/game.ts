@@ -6,7 +6,7 @@ export class Game implements IGame {
 
   id = -1;
   name: TLanguage = {en: '', ru: ''};
-  categoryID: number[] = [];
+  categoryIds: number[] = [];
   description: string[] = [];
   image = '';
   imageFullPath = '';
@@ -27,7 +27,7 @@ export class Game implements IGame {
     this.id = parseInt(game.ID, 10);
     this.name.en = game.Name.en ?? '';
     this.name.ru = game.Name.ru ?? '';
-    this.categoryID = game.CategoryID.map( (cat) => parseInt(cat, 10) );
+    this.categoryIds = game.CategoryID.map( (cat) => parseInt(cat, 10) );
     this.description = game.Description;
     this.image = game.Image;
     this.imageFullPath = game.ImageFullPath;
@@ -37,7 +37,7 @@ export class Game implements IGame {
 
   public get Category(): Category[] {
     if (!this.category.length) {
-      this.category = this.categoryID.map( (cat) => Category.getObjectById(cat) );
+      this.category = this.categoryIds.map( (cat) => Category.getObjectById(cat) );
     }
     return this.category;
   }
