@@ -28,11 +28,30 @@ header .container {
   flex: auto;
 }
 .container > aside {
-  flex: 0 1 25%;
+  flex: 0 0 25%;
 }
 
 aside {
+  margin:0 1rem 0 1rem;
 }
 aside > section:nth-child(n+2) {
   margin-top: 50px;
+}
+
+main {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  display: flex;
+  margin: 0 -1rem;
+}
+main > article {
+  flex: 0 0 33%;
+  width: 33%;
+  padding: 1rem 1rem 3rem;
+  position: relative;
+}
+
+#star {
+  display: flex;
+  align-items: center;
 }

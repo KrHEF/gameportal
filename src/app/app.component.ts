@@ -5,6 +5,7 @@ import {Category} from './classes/category';
 import {Game} from './classes/game';
 import {Merchant} from './classes/merchant';
 import {Pager} from './classes/pager';
+import {TFiltered, TSorting} from './types';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,7 @@ export class AppComponent implements OnInit {
 
   readonly title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 7];
+  readonly version: number[] = [1, 0, 0, 8];
 
   public pager: Pager;
   public storageSettings = {
@@ -54,10 +55,15 @@ export class AppComponent implements OnInit {
   private gamesInFavorites: Game[] = [];
   private gamesFiltered: Game[];
 
-  public filters = {
+  private filters: TFiltered = {
     categories: [],
     merchants: [],
     name: '',
+  };
+  private sorting: TSorting = {
+    favorites: false,
+    property: 'name',
+    direction: 'asc',
   };
 
 
@@ -135,6 +141,8 @@ export class AppComponent implements OnInit {
           this.storageSettings.gamesOnPage.value,
           this.storageSettings.gamePageNumber.value);
 
+        this.sortGames();
+
         this.initFavorites();
         // this.initFilters();
       }
@@ -144,12 +152,12 @@ export class AppComponent implements OnInit {
   // Игры, отображающиеся на странице с учетом текущей страницы
   private setCurrentGames(): void {
     if (this.pager) {
-      this.gamesOnPage = this.gamesFiltered.slice(this.pager.StartIndex, this.pager.EndIndex);
+      this.gamesOnPage = this.gamesFiltered.slice(this.pager.StartIndex, this.pager.EndIndex + 1);
     }
   }
 
   // Отфильтрованные игры
-  private setFilteredGames(): void {
+  private filterGames(): void {
     const f = this.filters;
     let result: Game[] = this.games;
 
@@ -182,6 +190,27 @@ export class AppComponent implements OnInit {
 
     this.pager.update(this.gamesFiltered.length);
     this.setCurrentGames();
+  }
+
+  private sortGames(): void {
+    const sortGames = (a: Game, b: Game) => {
+      switch (this.sorting.property) {
+        case 'name':
+          const desc: number = this.sorting.direction === 'desc' ? -1 : 1;
+          return a.Name > b.Name ? desc : -desc;
+      }
+    };
+
+    const upFavorites = (a: Game, b: Game) => {
+      if (a.isFavorites === b.isFavorites) { return 0; }
+      return a.isFavorites ? -1 : 1;
+    };
+
+    this.games.sort(sortGames);
+    if (this.sorting.favorites) {
+      this.games.sort(upFavorites);
+    }
+    this.filterGames();
   }
 
   // События пейджера
@@ -220,8 +249,8 @@ export class AppComponent implements OnInit {
   }
 
   public toggleFavorites(show: boolean): void {
-    // this.filters.favorites = show ? this.gamesInFavorites : [];
-    // this.setFilteredGames();
+    this.sorting.favorites = show;
+    this.sortGames();
   }
 
   // События фильтров
@@ -240,12 +269,12 @@ export class AppComponent implements OnInit {
     // Названия
     this.filters.name = setting.filterName.value;
 
-    this.setFilteredGames();
+    this.filterGames();
   }
 
   public changeFilterCategories(selectedItems: Category[]): void {
     this.filters.categories = selectedItems;
-    this.setFilteredGames();
+    this.filterGames();
 
     this.storageSettings.filterCategories.value = selectedItems.map((item) => item.id).join();
     this.saveInStorage();
@@ -253,7 +282,7 @@ export class AppComponent implements OnInit {
 
   public changeFilterMerchant(selectedItems: Merchant[]): void {
     this.filters.merchants = selectedItems;
-    this.setFilteredGames();
+    this.filterGames();
 
     this.storageSettings.filterMerchant.value = selectedItems.map((item) => item.id).join();
     this.saveInStorage();
@@ -261,7 +290,7 @@ export class AppComponent implements OnInit {
 
   public changeFilterName(text: string): void {
     this.filters.name = text.trim();
-    this.setFilteredGames();
+    this.filterGames();
 
     this.storageSettings.filterName.value = text;
     this.saveInStorage();

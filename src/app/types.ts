@@ -79,3 +79,15 @@ export interface IFiltered {
   id: number;
   Name: string;
 }
+
+export type TFiltered = {
+  categories: IFiltered[],
+  merchants: IFiltered[],
+  name: string,
+};
+
+export type TSorting = {
+  favorites: boolean,
+  property: 'name',
+  direction: 'asc' | 'desc',
+};

@@ -1,1 +1,28 @@
-.star.on { font-size: 2em; }
+a.star {
+  color: red;
+  display: block;
+  font-size: 2.5rem;
+  height: 3rem;
+  position: relative;
+  text-decoration: none;
+  text-indent: -9999px;
+  width: 3rem;
+}
+a.star:before {
+  content: '♡';
+  display: flex;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  text-indent: 0;
+  top: 0;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+a.star.on {
+}
+a.star.on:before {
+  content: '❤';
+}
+

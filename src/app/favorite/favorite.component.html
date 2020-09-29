@@ -1,3 +1,4 @@
 <a href="#" class="star" title="Показать/скрыть избранные игры"
+   [class.on]="show"
    (click)="toggleFavorite($event.target)"
 >*</a> {{length}}

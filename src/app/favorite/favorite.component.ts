@@ -11,7 +11,7 @@ export class FavoriteComponent implements OnInit {
 
   @Output() toggleFavoriteHandler: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  private show = false;
+  public show = false;
 
   constructor() { }
 
@@ -22,14 +22,6 @@ export class FavoriteComponent implements OnInit {
     if (!this.length) { return; }
 
     this.show = !this.show;
-    if (target instanceof HTMLAnchorElement) {
-      if (this.show) {
-        target.className += ' on';
-      } else {
-        target.className = target.className.replace('on', '').trim();
-      }
-    }
-
     this.toggleFavoriteHandler.emit(this.show);
   }
 
