@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, Observer, Subscriber} from 'rxjs';
-import {TGame, TCategory, TGameData, TMerchant, IMerchant} from './types';
+import {Observable} from 'rxjs';
+import {TGameData} from './types';
 import {Game} from './classes/game';
 import {Category} from './classes/category';
 import {Merchant} from './classes/merchant';

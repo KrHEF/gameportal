@@ -1,13 +1,25 @@
-import {ICategory, IFiltered, TCategory, TLanguage} from '../types';
+import {IFiltered, TCategory, TLanguage} from '../types';
 
-export class Category implements ICategory, IFiltered {
+export class Category implements IFiltered {
 
+  // Коллекцию объектов этого класса.
   private static collection: Category[] = [];
 
-  id = -1;
-  name: TLanguage = {en: '', ru: ''};
-  sort = 0;
+  private id = -1;
+  private name: TLanguage = {en: '', ru: ''};
+  private sort = 0;
 
+  /**
+   * Идентификатор категории
+   */
+  public get Id(): number {
+    return this.id;
+  }
+
+  /**
+   * Название категории
+   * пока сделано так, что если нет русского названия выводится английское.
+   */
   public get Name(): string {
     return (this.name.ru !== '') ? this.name.ru : this.name.en;
   }
@@ -27,7 +39,7 @@ export class Category implements ICategory, IFiltered {
   }
 
   public static getObjectById(id: number): Category {
-    return Category.collection.find( (obj) => obj.id === id );
+    return Category.collection.find((obj) => obj.Id === id);
   }
 
 }

@@ -1,12 +1,22 @@
-import {IFiltered, IMerchant, TLanguage, TMerchant} from '../types';
+import {IFiltered, TLanguage, TMerchant} from '../types';
 
-export class Merchant implements IMerchant, IFiltered {
+export class Merchant implements IFiltered {
 
+  // Коллекцию объектов этого класса.
   private static collection: Merchant[] = [];
 
-  id = -1;
-  name: TLanguage = {en: '', ru: ''};
+  private id = -1;
+  private name: TLanguage = {en: '', ru: ''};
 
+  /**
+   * Идентификатор поставщика
+   */
+  public get Id(): number { return this.id; }
+
+  /**
+   * Название поставщика
+   * пока сделано так, что если нет русского названия выводится английское.
+   */
   public get Name(): string {
     return (this.name.ru !== '') ? this.name.ru : this.name.en;
   }
@@ -23,6 +33,6 @@ export class Merchant implements IMerchant, IFiltered {
   }
 
   public static getObjectById(id: number): Merchant {
-    return Merchant.collection.find( (merch) => merch.id === id );
+    return Merchant.collection.find( (merch) => merch.Id === id );
   }
 }

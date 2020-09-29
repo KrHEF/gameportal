@@ -17,14 +17,6 @@ export type TCategory = {
   menuId: string,
 };
 
-export interface ICategory {
-  id: number;
-  name: TLanguage;
-  sort: number;
-  slug?: string;
-  menuId?: string;
-}
-
 export type TGame = {
   ID: string,
   Image: string,
@@ -35,17 +27,6 @@ export type TGame = {
   MerchantID: string,
   Sort: string,
 };
-
-export interface IGame {
-  id: number;
-  image: string;
-  imageFullPath: string;
-  name: TLanguage;
-  description: string[];
-  categoryIds: number[];
-  merchantId: number;
-  sort: number;
-}
 
 export interface IMerchantData {
   [index: string]: TMerchant;
@@ -60,13 +41,6 @@ export type TMerchant = {
   menuID: string,
 };
 
-export interface IMerchant {
-  id: number;
-  name: TLanguage;
-  alias?: string;
-  image?: string;
-  menuID?: string;
-}
 
 // export interface IPager {
 //   PageNumber: number;
@@ -77,7 +51,7 @@ export interface IMerchant {
 // }
 
 export interface IFiltered {
-  id: number;
+  Id: number;
   Name: string;
 }
 

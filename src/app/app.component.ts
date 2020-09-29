@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
 
   readonly title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 8];
+  readonly version: number[] = [1, 0, 0, 9];
 
   public pager: Pager;
   public storageSettings: TStorageSetting = {
@@ -66,12 +66,12 @@ export class AppComponent implements OnInit {
   private sorting: TSorting = {
     favorites: false,
     list: [
-      { id: 0, Name: 'По названию (а-я)'},
-      { id: 1, Name: 'По названию (я-а)' },
-      { id: 2, Name: 'По кол-ву символов в названии (1-9)' },
-      { id: 3, Name: 'По кол-ву символов в названии (9-1)' },
-      { id: 4, Name: 'По идентификатору (1-9)' },
-      { id: 5, Name: 'По идентификатору (9-1)' },
+      { Id: 0, Name: 'По названию (а-я)'},
+      { Id: 1, Name: 'По названию (я-а)' },
+      { Id: 2, Name: 'По кол-ву символов в названии (1-9)' },
+      { Id: 3, Name: 'По кол-ву символов в названии (9-1)' },
+      { Id: 4, Name: 'По идентификатору (1-9)' },
+      { Id: 5, Name: 'По идентификатору (9-1)' },
     ],
     value: 0,
   };
@@ -188,22 +188,23 @@ export class AppComponent implements OnInit {
       if (f.categories.length > 0) {
         result = result.filter((game) => {
           return f.categories.some((cat) => {
-            return game.categoryIds.includes(cat.id)
-              || (cat.id === 0 && game.isFavorites);
+            return game.categoryIds.includes(cat.Id)
+              || (cat.Id === 0 && game.isFavorites);
           });
         });
       }
       // Фильтр по производителям
       if (f.merchants.length > 0) {
         result = result.filter((game) => {
-          return f.merchants.some((merch) => merch.id === game.merchantId);
+          return f.merchants.some((merch) => merch.Id === game.merchantId);
         });
       }
       // Фильтр по названию
       if (f.name.length > 0) {
         result = result.filter((game) => {
-          return game.name.ru.toLowerCase().includes(f.name.toLowerCase())
-            || game.name.en.toLowerCase().includes(f.name.toLowerCase());
+          return game.Name.toLowerCase().includes(f.name.toLowerCase());
+          // return game.name.ru.toLowerCase().includes(f.name.toLowerCase())
+          //   || game.name.en.toLowerCase().includes(f.name.toLowerCase());
         });
       }
 
@@ -237,7 +238,7 @@ export class AppComponent implements OnInit {
           desc = -1;
         // tslint:disable-next-line:no-switch-case-fall-through
         case 5:
-          return a.id < b.id ? desc : -desc;
+          return a.Id < b.Id ? desc : -desc;
       }
 
       return 0;
@@ -280,13 +281,13 @@ export class AppComponent implements OnInit {
       .map((id: string) => parseInt(id, 10))
       .filter((id: number) => !isNaN(id));
 
-    this.games.forEach((game) => game.isFavorites = (gameIds.indexOf(game.id) >= 0));
+    this.games.forEach((game) => game.isFavorites = (gameIds.indexOf(game.Id) >= 0));
     this.changeFavorites();
   }
 
   public changeFavorites(): void {
     this.gamesInFavorites = this.games.filter((game) => game.isFavorites);
-    this.storageSettings.gamesInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
+    this.storageSettings.gamesInFavorites.value = this.gamesInFavorites.map((item) => item.Id).join();
     StorageService.save(this.storageSettings);
   }
 
@@ -302,11 +303,11 @@ export class AppComponent implements OnInit {
 
     // Категории
     const catIds: number[] = this.getNumbersFromString(setting.filterCategories.value.toString());
-    this.filters.categories = this.categories.filter((cat) => catIds.includes(cat.id));
+    this.filters.categories = this.categories.filter((cat) => catIds.includes(cat.Id));
 
     // Мерчанты
     const merchIds: number[] = this.getNumbersFromString(setting.filterMerchant.value.toString());
-    this.filters.merchants = this.merchants.filter((merch) => merchIds.includes(merch.id));
+    this.filters.merchants = this.merchants.filter((merch) => merchIds.includes(merch.Id));
 
     // Названия
     this.filters.name = setting.filterName.value.toString();
@@ -318,7 +319,7 @@ export class AppComponent implements OnInit {
     this.filters.categories = selectedItems;
     this.filterGames();
 
-    this.storageSettings.filterCategories.value = selectedItems.map((item) => item.id).join();
+    this.storageSettings.filterCategories.value = selectedItems.map((item) => item.Id).join();
     StorageService.save(this.storageSettings);
   }
 
@@ -326,7 +327,7 @@ export class AppComponent implements OnInit {
     this.filters.merchants = selectedItems;
     this.filterGames();
 
-    this.storageSettings.filterMerchant.value = selectedItems.map((item) => item.id).join();
+    this.storageSettings.filterMerchant.value = selectedItems.map((item) => item.Id).join();
     StorageService.save(this.storageSettings);
   }
 
@@ -339,7 +340,7 @@ export class AppComponent implements OnInit {
   }
 
   public changeOrdering(selectedItems: IFiltered[]): void {
-    this.sorting.value = selectedItems.length > 0 ? selectedItems[0].id : this.sorting.value;
+    this.sorting.value = selectedItems.length > 0 ? selectedItems[0].Id : this.sorting.value;
     this.storageSettings.orderBy.value = this.sorting.value;
     this.sortGames();
 

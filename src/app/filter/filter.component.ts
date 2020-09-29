@@ -31,7 +31,7 @@ export class FilterComponent {
             .filter((id) => !isNaN(id));
 
           const result: IFiltered[] = this.values.filter((val) => {
-            return selectIds.some((id) => id >= 0 && id === val.id);
+            return selectIds.some((id) => id >= 0 && id === val.Id);
           });
 
           this.changeValueHandler.emit(result);
@@ -43,7 +43,7 @@ export class FilterComponent {
           let result: IFiltered[] = [];
 
           if (selectId >= 0) {
-            result = this.values.filter((val) => val.id === selectId);
+            result = this.values.filter((val) => val.Id === selectId);
           }
 
           this.changeValueHandler.emit(result);
