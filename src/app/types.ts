@@ -1,3 +1,4 @@
+
 export type TLanguage = {
   en: string,
   ru: string,
@@ -88,6 +89,14 @@ export type TFiltered = {
 
 export type TSorting = {
   favorites: boolean,
-  property: 'name',
-  direction: 'asc' | 'desc',
+  list: IFiltered[],
+  value: number,
+};
+
+export type TStorageSetting = {
+  [index: string]: {
+    storable: boolean,
+    value: string | number,
+    values?: string[] | number [],
+  }
 };

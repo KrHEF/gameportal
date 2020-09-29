@@ -1,6 +1,7 @@
 .container {
   display: flex;
   justify-content: space-between;
+  min-width: 800px;
   padding: 0 15px;
 }
 
@@ -32,23 +33,39 @@ header .container {
 }
 
 aside {
-  margin:0 1rem 0 1rem;
+  margin:1rem -1rem 1rem 1rem;
 }
 aside > section:nth-child(n+2) {
-  margin-top: 50px;
+  margin-top: 3rem;
+}
+
+aside > section > app-filter,
+aside > section > app-setting {
+  display: block;
+  margin: 1rem 0 0;
 }
 
 main {
   align-items: flex-start;
   flex-wrap: wrap;
   display: flex;
-  margin: 0 -1rem;
 }
 main > article {
   flex: 0 0 33%;
   width: 33%;
   padding: 1rem 1rem 3rem;
   position: relative;
+}
+
+main > article.not-found {
+  align-items: center;
+  font-size: 2rem;
+  color: #424242;
+  display: flex;
+  flex:auto;
+  justify-content: center;
+  height: 50vh;
+  width: 100%;
 }
 
 #star {

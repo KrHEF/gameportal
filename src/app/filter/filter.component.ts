@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {IFiltered} from '../types';
 
 @Component({
@@ -6,7 +6,7 @@ import {IFiltered} from '../types';
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.css']
 })
-export class FilterComponent implements OnInit, OnChanges {
+export class FilterComponent {
 
   @Input() type: 'multiselect' | 'select' | 'input';
   @Input() values: IFiltered[];
@@ -15,38 +15,37 @@ export class FilterComponent implements OnInit, OnChanges {
   @Output() changeValueHandler: EventEmitter<IFiltered[] | string> = new EventEmitter<IFiltered[] | string>();
 
   private timer = 0;
-  public stringValues: string[] = [];
 
   constructor() {
   }
 
-  ngOnInit(): void {
-  }
-
-  ngOnChanges(): void {
-    if (this.values) {
-      this.stringValues = this.values?.map((item) => item.Name);
-    }
-  }
-
   public changeValue(element: EventTarget): void {
+    // Пришлось немного усложнить логику, чтобы можно было переизпользовать.
+    // Основная идея, добавлять в начало поле Не выбрано с индексом < 0
+    // ToDo: хранить коллекции в Set, чтобы иметь доступ к элементу по id и неделать кучи фильтраций.
     switch (this.type) {
       case 'multiselect':
         if (element && element instanceof HTMLSelectElement) {
           const selectIds: number[] = Array.from(element.selectedOptions)
             .map((opt) => +opt.value)
             .filter((id) => !isNaN(id));
-          const result: IFiltered[] = selectIds.map((id) => this.values[id]);
+
+          const result: IFiltered[] = this.values.filter((val) => {
+            return selectIds.some((id) => id >= 0 && id === val.id);
+          });
+
           this.changeValueHandler.emit(result);
         }
         break;
       case 'select':
         if (element && element instanceof HTMLSelectElement) {
           const selectId: number = +element.value;
-          const result: IFiltered[] = [];
+          let result: IFiltered[] = [];
+
           if (selectId >= 0) {
-            result.push(this.values[selectId]);
+            result = this.values.filter((val) => val.id === selectId);
           }
+
           this.changeValueHandler.emit(result);
         }
         break;

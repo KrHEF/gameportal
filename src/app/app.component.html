@@ -20,8 +20,8 @@
       <span class="total" *ngIf="GamesCount">Игр: <b *ngIf="isFiltered">{{FilteredGamesCount}}
         /</b><b>{{GamesCount}}</b></span>
       <!--      <a href="#" class="search" title="Показать панель поиска">Поиск</a>-->
-      <a href="#" class="filter" title="Открыть окно с фильтрами">Фильтры <span *ngIf="isFiltered">!</span></a>
-      <a href="#" class="setting" title="Открыть окно с настройками ">Настройки</a>
+<!--      <a href="#" class="filter" title="Открыть окно с фильтрами">Фильтры <span *ngIf="isFiltered">!</span></a>-->
+<!--      <a href="#" class="setting" title="Открыть окно с настройками ">Настройки</a>-->
     </div>
   </div>
 </header>
@@ -34,7 +34,7 @@
         (changeFavoritesHandler)="changeFavorites()"
       ></app-game>
     </article>
-    <article class="sorry" *ngIf="isFiltered && !FilteredGamesCount">
+    <article class="not-found" *ngIf="isFiltered && !FilteredGamesCount">
       Игры не найдены.
     </article>
   </main>
@@ -55,19 +55,20 @@
         [values]="merchants"
         (changeValueHandler)="changeFilterMerchant($event)"
       >
-        <h4 class="head">Провайдер:</h4>
+        <h4 class="head">Поставщик:</h4>
       </app-filter>
       <app-filter
         type="input"
         (changeValueHandler)="changeFilterName($event)"
       >
-        <h4 class="head">Фильтр по названию:</h4>
+        <h4 class="head">По названию:</h4>
       </app-filter>
     </section>
 
     <!-- Настройки-->
     <section class="setting-wrapper">
       <h3>Настройки: </h3>
+      <!-- Кол-во на странице -->
       <app-setting
         type="select"
         [values]="storageSettings.gamesOnPage.values"
@@ -76,6 +77,15 @@
       >
         <h4 class="head">На странице:</h4>
       </app-setting>
+
+      <!-- Сортировка -->
+      <app-filter
+        type="select"
+        [values]="SortingList"
+        (changeValueHandler)="changeOrdering($event)"
+      >
+        <h4 class="head">Сортировка:</h4>
+      </app-filter>
     </section>
 
     <section class="footer">

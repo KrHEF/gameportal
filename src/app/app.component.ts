@@ -5,7 +5,7 @@ import {Category} from './classes/category';
 import {Game} from './classes/game';
 import {Merchant} from './classes/merchant';
 import {Pager} from './classes/pager';
-import {TFiltered, TSorting} from './types';
+import {IFiltered, TFiltered, TSorting, TStorageSetting} from './types';
 
 @Component({
   selector: 'app-root',
@@ -19,33 +19,36 @@ export class AppComponent implements OnInit {
   readonly version: number[] = [1, 0, 0, 8];
 
   public pager: Pager;
-  public storageSettings = {
-    storageService: StorageService.get(),
+  public storageSettings: TStorageSetting = {
     gamesOnPage: {
-      storable: 1,
+      storable: true,
       values: [10, 20, 30, 40, 50],
       value: 10,
     },
     gamePageNumber: {
-      // storable: 1,
+      storable: false,
       value: 1,
     },
-    gameInFavorites: {
-      storable: 1,
+    gamesInFavorites: {
+      storable: true,
       value: '',
     },
     filterCategories: {
-      storable: 1,
+      storable: true,
       value: '',
     },
     filterMerchant: {
-      storable: 1,
+      storable: true,
       value: '',
     },
     filterName: {
-      storable: 1,
+      storable: true,
       value: '',
     },
+    orderBy: {
+      storable: true,
+      value: 0,
+    }
   };
 
   public categories: Category[] = [];
@@ -62,14 +65,21 @@ export class AppComponent implements OnInit {
   };
   private sorting: TSorting = {
     favorites: false,
-    property: 'name',
-    direction: 'asc',
+    list: [
+      { id: 0, Name: 'По названию (а-я)'},
+      { id: 1, Name: 'По названию (я-а)' },
+      { id: 2, Name: 'По кол-ву символов в названии (1-9)' },
+      { id: 3, Name: 'По кол-ву символов в названии (9-1)' },
+      { id: 4, Name: 'По идентификатору (1-9)' },
+      { id: 5, Name: 'По идентификатору (9-1)' },
+    ],
+    value: 0,
   };
+
 
 
   /**
    * Количество загруженных игр
-   * @constructor
    */
   public get GamesCount(): number {
     return this.games.length;
@@ -77,7 +87,6 @@ export class AppComponent implements OnInit {
 
   /**
    * Количество игр в избранном
-   * @constructor
    */
   public get FavoriteGamesCount(): number {
     return this.gamesInFavorites.length;
@@ -85,7 +94,6 @@ export class AppComponent implements OnInit {
 
   /**
    * Количество отфильтрованных игр
-   * @constructor
    */
   public get FilteredGamesCount(): number {
     return this.gamesFiltered.length;
@@ -112,10 +120,14 @@ export class AppComponent implements OnInit {
     return this.gamesOnPage;
   }
 
+  public get SortingList(): IFiltered[] {
+    return this.sorting.list;
+  }
+
   constructor(
     private dataService: DataService,
   ) {
-    this.loadFromStorage();
+    StorageService.load(this.storageSettings);
   }
 
   ngOnInit(): void {
@@ -131,15 +143,25 @@ export class AppComponent implements OnInit {
           menuId: 'favorites'
         });
 
+        const notUseMerch: Merchant = new Merchant({
+          ID: '-1',
+          Name: '- Не выбрано -',
+          IDParent: '0',
+          Alias: 'NotUse',
+          Image: '',
+          menuID: 'notuse',
+        });
+
         this.categories = this.dataService.categories.sort(sortByName);
         this.categories.unshift(favoritesCategory);
         this.merchants = this.dataService.merchants.sort(sortByName);
+        this.merchants.unshift(notUseMerch);
         this.games = this.dataService.games;
         this.gamesFiltered = this.games;
 
         this.pager = new Pager(this.GamesCount,
           this.storageSettings.gamesOnPage.value,
-          this.storageSettings.gamePageNumber.value);
+          +this.storageSettings.gamePageNumber.value);
 
         this.sortGames();
 
@@ -194,11 +216,31 @@ export class AppComponent implements OnInit {
 
   private sortGames(): void {
     const sortGames = (a: Game, b: Game) => {
-      switch (this.sorting.property) {
-        case 'name':
-          const desc: number = this.sorting.direction === 'desc' ? -1 : 1;
+      let desc: -1 | 1 = 1;
+
+      switch (this.sorting.value) {
+        // По названию
+        case 1:
+          desc = -1;
+        // tslint:disable-next-line:no-switch-case-fall-through
+        case 0:
           return a.Name > b.Name ? desc : -desc;
+
+        // По длине названия )
+        case 2:
+          desc = -1;
+        // tslint:disable-next-line:no-switch-case-fall-through
+        case 3:
+          return a.Name.length < b.Name.length ? desc : -desc;
+
+        case 4:
+          desc = -1;
+        // tslint:disable-next-line:no-switch-case-fall-through
+        case 5:
+          return a.id < b.id ? desc : -desc;
       }
+
+      return 0;
     };
 
     const upFavorites = (a: Game, b: Game) => {
@@ -219,7 +261,7 @@ export class AppComponent implements OnInit {
     this.storageSettings.gamePageNumber.value = this.pager.PageNumber;
     this.setCurrentGames();
 
-    this.saveInStorage();
+    StorageService.save(this.storageSettings);
   }
 
   public changeGamesOnPageCount(value: number): void {
@@ -227,14 +269,14 @@ export class AppComponent implements OnInit {
     this.storageSettings.gamesOnPage.value = this.pager.ItemOnPage;
     this.setCurrentGames();
 
-    this.saveInStorage();
+    StorageService.save(this.storageSettings);
   }
 
   // События избранных
 
   private initFavorites(): void {
-    const gameIds: number[] = this.storageSettings.gameInFavorites.value
-      .split(',')
+    const gameIds: number[] = this.storageSettings.gamesInFavorites.value
+      .toString().split(',')
       .map((id: string) => parseInt(id, 10))
       .filter((id: number) => !isNaN(id));
 
@@ -244,8 +286,8 @@ export class AppComponent implements OnInit {
 
   public changeFavorites(): void {
     this.gamesInFavorites = this.games.filter((game) => game.isFavorites);
-    this.storageSettings.gameInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
-    this.saveInStorage();
+    this.storageSettings.gamesInFavorites.value = this.gamesInFavorites.map((item) => item.id).join();
+    StorageService.save(this.storageSettings);
   }
 
   public toggleFavorites(show: boolean): void {
@@ -259,15 +301,15 @@ export class AppComponent implements OnInit {
     const setting = this.storageSettings;
 
     // Категории
-    const catIds: number[] = this.getNumbersFromString(setting.filterCategories.value);
+    const catIds: number[] = this.getNumbersFromString(setting.filterCategories.value.toString());
     this.filters.categories = this.categories.filter((cat) => catIds.includes(cat.id));
 
     // Мерчанты
-    const merchIds: number[] = this.getNumbersFromString(setting.filterMerchant.value);
+    const merchIds: number[] = this.getNumbersFromString(setting.filterMerchant.value.toString());
     this.filters.merchants = this.merchants.filter((merch) => merchIds.includes(merch.id));
 
     // Названия
-    this.filters.name = setting.filterName.value;
+    this.filters.name = setting.filterName.value.toString();
 
     this.filterGames();
   }
@@ -277,7 +319,7 @@ export class AppComponent implements OnInit {
     this.filterGames();
 
     this.storageSettings.filterCategories.value = selectedItems.map((item) => item.id).join();
-    this.saveInStorage();
+    StorageService.save(this.storageSettings);
   }
 
   public changeFilterMerchant(selectedItems: Merchant[]): void {
@@ -285,7 +327,7 @@ export class AppComponent implements OnInit {
     this.filterGames();
 
     this.storageSettings.filterMerchant.value = selectedItems.map((item) => item.id).join();
-    this.saveInStorage();
+    StorageService.save(this.storageSettings);
   }
 
   public changeFilterName(text: string): void {
@@ -293,60 +335,23 @@ export class AppComponent implements OnInit {
     this.filterGames();
 
     this.storageSettings.filterName.value = text;
-    this.saveInStorage();
+    StorageService.save(this.storageSettings);
   }
 
-  // LocalStorage
+  public changeOrdering(selectedItems: IFiltered[]): void {
+    this.sorting.value = selectedItems.length > 0 ? selectedItems[0].id : this.sorting.value;
+    this.storageSettings.orderBy.value = this.sorting.value;
+    this.sortGames();
 
-  /**
-   * Сохранение всех сохраняемых настроек в localStorage
-   * @private
-   */
-  private saveInStorage(): void {
-    for (const key in this.storageSettings) {
-      if (this.storageSettings.hasOwnProperty(key)) {
-
-        const setting = this.storageSettings[key];
-        if (setting.hasOwnProperty('storable')
-          && setting.hasOwnProperty('value')
-          && setting.storable) {
-          this.storageSettings.storageService.setItem(key, setting.value.toString());
-        }
-      }
-    }
+    StorageService.save(this.storageSettings);
   }
 
-  /**
-   * Получение настроек сохраняемых настроек из localStorage
-   * @private
-   */
-  private loadFromStorage(): void {
-    for (const key in this.storageSettings) {
-      if (this.storageSettings.hasOwnProperty(key)) {
 
-        const setting = this.storageSettings[key];
-        if (!setting.hasOwnProperty('storable')
-          || !setting.hasOwnProperty('value')
-          || !setting.storable) {
-          continue;
-        }
-
-        const value: string = this.storageSettings.storageService.getItem(key);
-        if (!value) {
-          continue;
-        } else if ((typeof setting.value === 'string')) {
-          setting.value = value;
-        } else if ((typeof setting.value === 'number') && parseInt(value, 10)) {
-          setting.value = parseInt(value, 10);
-        }
-      }
-    }
-  }
+  // Вспомогательные методы
 
   private getNumbersFromString(str: string): number[] {
     return str.split(',')
       .map((id: string) => parseInt(id, 10))
       .filter((id: number) => !isNaN(id));
   }
-
 }

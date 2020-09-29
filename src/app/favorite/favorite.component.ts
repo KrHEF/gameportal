@@ -19,7 +19,7 @@ export class FavoriteComponent implements OnInit {
   }
 
   public toggleFavorite(target: EventTarget): void {
-    if (!this.length) { return; }
+    if (!this.length && !this.show) { return; }
 
     this.show = !this.show;
     this.toggleFavoriteHandler.emit(this.show);

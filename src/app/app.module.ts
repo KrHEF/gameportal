@@ -17,7 +17,7 @@ import {ReactiveFormsModule} from '@angular/forms';
     PagerComponent,
     SettingComponent,
     FavoriteComponent,
-    FilterComponent
+    FilterComponent,
   ],
   imports: [
     BrowserModule,
