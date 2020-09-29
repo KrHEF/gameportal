@@ -22,7 +22,7 @@ export class FilterComponent {
   public changeValue(element: EventTarget): void {
     // Пришлось немного усложнить логику, чтобы можно было переизпользовать.
     // Основная идея, добавлять в начало поле Не выбрано с индексом < 0
-    // ToDo: хранить коллекции в Set, чтобы иметь доступ к элементу по id и неделать кучи фильтраций.
+    // ToDo: хранить коллекции в Map, чтобы иметь доступ к элементу по id и неделать кучи фильтраций.
     switch (this.type) {
       case 'multiselect':
         if (element && element instanceof HTMLSelectElement) {

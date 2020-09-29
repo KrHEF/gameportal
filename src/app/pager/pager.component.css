@@ -1,0 +1,36 @@
+.pager {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 0 7px -3px #424242;
+  display: flex;
+  font-size: 1.5rem;
+}
+
+.pager > * {
+  align-items: center;
+  display: flex;
+  font-weight: bold;
+  height: 2.4rem;
+  justify-content: center;
+  padding: 0.2rem;
+  width: 2.4rem;
+}
+
+.pager a {
+  text-decoration: none;
+}
+
+.pager a:hover {
+  color: brown;
+}
+
+.prev {
+
+}
+
+.next {
+
+}
+
+span {
+}

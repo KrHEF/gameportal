@@ -6,8 +6,10 @@
 }
 
 header nav {
+  flex: none;
   align-self: center;
 }
+
 header h1,
 header .panel {
   flex: 0 1 25%;
@@ -17,23 +19,39 @@ header .panel {
   display: flex;
   justify-content: flex-end;
 }
+
 header .panel > * {
   margin: 0 10px;
 }
 
-header .container {
+header > .container {
   align-items: center;
+  background: #fff;
+  border-bottom: solid 1px #eee;
+  height: 4rem;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 
 .container > main {
   flex: auto;
+  margin-top: 5rem;
 }
+
 .container > aside {
   flex: 0 0 25%;
+  margin-top: 5rem;
 }
 
 aside {
-  margin:1rem -1rem 1rem 1rem;
+  margin: 1rem -1rem 1rem 1rem;
+}
+
+aside > section:first-child {
+  margin-top: 1rem;
 }
 aside > section:nth-child(n+2) {
   margin-top: 3rem;
@@ -50,6 +68,7 @@ main {
   flex-wrap: wrap;
   display: flex;
 }
+
 main > article {
   flex: 0 0 33%;
   width: 33%;
@@ -62,7 +81,7 @@ main > article.not-found {
   font-size: 2rem;
   color: #424242;
   display: flex;
-  flex:auto;
+  flex: auto;
   justify-content: center;
   height: 50vh;
   width: 100%;

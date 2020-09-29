@@ -1,4 +1,5 @@
-import {IFiltered, TLanguage, TMerchant} from '../types';
+import {IFiltered, TMerchant} from '../types';
+import {Language} from './language';
 
 export class Merchant implements IFiltered {
 
@@ -6,7 +7,7 @@ export class Merchant implements IFiltered {
   private static collection: Merchant[] = [];
 
   private id = -1;
-  private name: TLanguage = {en: '', ru: ''};
+  private name: Language;
 
   /**
    * Идентификатор поставщика
@@ -18,15 +19,17 @@ export class Merchant implements IFiltered {
    * пока сделано так, что если нет русского названия выводится английское.
    */
   public get Name(): string {
-    return (this.name.ru !== '') ? this.name.ru : this.name.en;
+    return this.name.toString();
   }
 
   public constructor({ID: id, Name: name}: TMerchant) {
     this.id = parseInt(id, 10);
-    this.name.en = name;
+    this.name = new Language({en: name, ru: name});
 
     Merchant.collection.push(this);
   }
+
+  // Статические методы
 
   public static getAll(): Merchant[] {
     return Merchant.collection;

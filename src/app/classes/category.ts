@@ -1,4 +1,5 @@
-import {IFiltered, TCategory, TLanguage} from '../types';
+import {IFiltered, TCategory} from '../types';
+import {Language} from './language';
 
 export class Category implements IFiltered {
 
@@ -6,7 +7,7 @@ export class Category implements IFiltered {
   private static collection: Category[] = [];
 
   private id = -1;
-  private name: TLanguage = {en: '', ru: ''};
+  private name: Language;
   private sort = 0;
 
   /**
@@ -21,18 +22,18 @@ export class Category implements IFiltered {
    * пока сделано так, что если нет русского названия выводится английское.
    */
   public get Name(): string {
-    return (this.name.ru !== '') ? this.name.ru : this.name.en;
+    return this.name.toString();
   }
 
-  constructor({ID: id, Name: {en, ru}, CSort: sort}: TCategory) {
+  constructor({ID: id, Name: dict, CSort: sort}: TCategory) {
     this.id = parseInt(id, 10);
-    this.name.en = en ?? '';
-    this.name.ru = ru ?? '';
+    this.name = new Language(dict);
     this.sort = parseInt(sort, 10);
 
     Category.collection.push(this);
   }
 
+  // Статические методы
 
   public static getAll(): Category[] {
     return Category.collection;

@@ -1,7 +1,6 @@
 
 export type TLanguage = {
-  en: string,
-  ru: string,
+  [name: string]: string,
 };
 export type TGameData = {
   categories: TCategory[],

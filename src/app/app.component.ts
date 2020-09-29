@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
 
   readonly title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 9];
+  readonly version: number[] = [1, 0, 0, 10];
 
   public pager: Pager;
   public storageSettings: TStorageSetting = {
@@ -188,7 +188,7 @@ export class AppComponent implements OnInit {
       if (f.categories.length > 0) {
         result = result.filter((game) => {
           return f.categories.some((cat) => {
-            return game.categoryIds.includes(cat.Id)
+            return game.CategoriesIds.includes(cat.Id)
               || (cat.Id === 0 && game.isFavorites);
           });
         });
@@ -196,15 +196,13 @@ export class AppComponent implements OnInit {
       // Фильтр по производителям
       if (f.merchants.length > 0) {
         result = result.filter((game) => {
-          return f.merchants.some((merch) => merch.Id === game.merchantId);
+          return f.merchants.some((merch) => merch.Id === game.Merchant.Id);
         });
       }
       // Фильтр по названию
       if (f.name.length > 0) {
         result = result.filter((game) => {
-          return game.Name.toLowerCase().includes(f.name.toLowerCase());
-          // return game.name.ru.toLowerCase().includes(f.name.toLowerCase())
-          //   || game.name.en.toLowerCase().includes(f.name.toLowerCase());
+          return game.includesName(f.name);
         });
       }
 

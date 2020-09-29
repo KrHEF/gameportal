@@ -2,6 +2,7 @@
 
 <div *ngIf="type === 'multiselect' || type === 'select'">
   <select
+      [title]="type === 'multiselect' ? 'Используйте клавиши Ctrl и Shift для мультивыбора' : ''"
       [attr.multiple]="type === 'multiselect' ? true : null"
       *ngIf="values.length"
       (change)="changeValue($event.target)"
