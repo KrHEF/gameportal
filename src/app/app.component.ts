@@ -14,9 +14,9 @@ import {IFiltered, TFiltered, TSorting, TStorageSetting} from './types';
 })
 export class AppComponent implements OnInit {
 
-  readonly title = 'Game Portal';
+  title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 10];
+  readonly version: number[] = [1, 0, 0, 11];
 
   public pager: Pager;
   public storageSettings: TStorageSetting = {
