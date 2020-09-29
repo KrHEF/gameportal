@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
 
   title = 'Game Portal';
   readonly author = 'EF';
-  readonly version: number[] = [1, 0, 0, 11];
+  readonly version: number[] = [1, 0, 1, 1];
 
   public pager: Pager;
   public storageSettings: TStorageSetting = {
