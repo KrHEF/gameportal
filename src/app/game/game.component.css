@@ -23,6 +23,7 @@ a {
 
 a.favorites {
   color: yellow;
+  cursor: pointer;
   display: block;
   font-size: 2em;
   height: 3rem;
